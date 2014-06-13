@@ -159,7 +159,7 @@
             impedimento = 1;
         }
         
-        NSString *query = [NSString stringWithFormat:@"%@/scrum_services/add-task.php?proj_id=%@&item_id=%@&titulo=%@&descricao=%@&bug=%d&imp=%d",url_basic,logged_proj_padrao, item_id, [[txt_titulo text]  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[txt_descricao text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],bug,impedimento];
+        NSString *query = [NSString stringWithFormat:@"%@/scrum_services/add-task.php?user_id=%@&proj_id=%@&item_id=%@&titulo=%@&descricao=%@&bug=%d&imp=%d",url_basic, logged_user_id, logged_proj_padrao, item_id, [[txt_titulo text]  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[txt_descricao text] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],bug,impedimento];
         
         NSString *data = [web_service getHTTPResponse:query];
         NSLog(@"%@",query);

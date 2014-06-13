@@ -17,6 +17,7 @@
 extern NSString *const url_basic;
 extern NSString * logged_user_id;
 extern NSString * logged_proj_padrao;
+extern NSString * logged_user_sigla;
 @property (nonatomic) NSError *last_error;
 @property (nonatomic) NSRange last_initial_range;
 @property (nonatomic) NSRange last_final_range;

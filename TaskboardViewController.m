@@ -40,79 +40,109 @@
     
     if([(UIPanGestureRecognizer*)sender state] == UIGestureRecognizerStateBegan) {
         
-        [sender view].layer.zPosition = MAXFLOAT;
-        firstX = [[sender view] center].x;
-        firstY = [[sender view] center].y;
-        [selected_view setHidden:false];
+        WebServiceRequest *web_service = [WebServiceRequest alloc];
+        NSString *xmlData = [web_service getHTTPResponse:[NSString stringWithFormat:@"%@/scrum_services/get-task-ptcp.php?trfa_id=%d",url_basic,[[sender view] tag]]];
         
-    }
-    else if ([(UIPanGestureRecognizer*)sender state] == UIGestureRecognizerStateEnded){
-        //NSLog(@"%f", firstX - [sender view].frame.size.height/2);
-        int estado_inicial = 0;
-        if (firstX - [sender view].frame.size.height/2 >= 190 && firstX - [sender view].frame.size.height/2 < 465) {
-            estado_inicial = 1;
-        }
-        else if (firstX - [sender view].frame.size.height/2 >= 465 && firstX - [sender view].frame.size.height/2 < 730){
-            estado_inicial = 2;
-        }
-        else if (firstX - [sender view].frame.size.height/2 >= 730){
-            estado_inicial = 3;
-        }
+        NSString *sigla = [web_service getTagValue:@"ptcp_sigla" inText:xmlData inInitialRange:0];
+        NSString *fase = [web_service getTagValue:@"fase_id" inText:xmlData inInitialRange:0];
+        int fase_int = [fase intValue];
+        NSLog(@"%@, %@",logged_user_sigla,sigla);
         
-        //NSLog(@"%f",firstX+ translatedPoint.x - [sender view].frame.size.height/2);
-        int estado_final = 0;
-        if (firstX+translatedPoint.x - [sender view].frame.size.height/2 >= 190 && firstX+translatedPoint.x - [sender view].frame.size.height/2 < 465) {
-            estado_final = 1;
-        }
-        else if (firstX+translatedPoint.x - [sender view].frame.size.height/2 >= 465 && firstX+translatedPoint.x - [sender view].frame.size.height/2 < 730){
-            estado_final = 2;
-        }
-        else if (firstX+translatedPoint.x - [sender view].frame.size.height/2 >= 730){
-            estado_final = 3;
-        }
-        
-        if (estado_final != estado_inicial) {
-            selected_fase_id = estado_final;
-            selected_task_id = [[sender view] tag];
-            change_state_alert = [[UIAlertView alloc] initWithTitle:@"Mudança de STATUS" message:@"Deseja alterar o estado da tarefa?" delegate:self cancelButtonTitle:@"Não" otherButtonTitles: @"Sim", nil];
-            [change_state_alert show];
+        NSLog(@"%@,%d",logged_user_sigla,[[sender view] tag]);
+        if (![sigla isEqual: logged_user_sigla] && fase_int > 1) {
+            can_move = NO;
+            return;
         }
         else
         {
-            [tableView reloadData];
+            can_move = YES;
         }
-        [selected_view setHidden:true];
-        [sender view].layer.zPosition = 0;
+        
+        if (can_move) {
+            [sender view].layer.zPosition = MAXFLOAT;
+            firstX = [[sender view] center].x;
+            firstY = [[sender view] center].y;
+            [selected_view setHidden:false];
+        }
         
     }
-    
-    translatedPoint = CGPointMake(firstX+translatedPoint.x, firstY+translatedPoint.y);
-    //NSLog(@"%f, %f : (0,%f)",translatedPoint.x - [sender view].frame.size.width/2, translatedPoint.y - [sender view].frame.size.height/2,[sender view].superview.frame.size.height - [sender view].frame.size.height);
-    
-    if (translatedPoint.y - [sender view].frame.size.height/2 > 0 && translatedPoint.y - [sender view].frame.size.height/2 < [sender view].superview.frame.size.height - [sender view].frame.size.height && translatedPoint.x - [sender view].frame.size.width/2 >= 200) {
-        [[sender view] setCenter:translatedPoint];
+    else if ([(UIPanGestureRecognizer*)sender state] == UIGestureRecognizerStateEnded){
+        if (can_move) {
+            
+                int estado_inicial = 0;
+                if (firstX - [sender view].frame.size.height/2 >= 190 && firstX - [sender view].frame.size.height/2 < 465) {
+                    estado_inicial = 1;
+                }
+                else if (firstX - [sender view].frame.size.height/2 >= 465 && firstX - [sender view].frame.size.height/2 < 730){
+                    estado_inicial = 2;
+                }
+                else if (firstX - [sender view].frame.size.height/2 >= 730){
+                    estado_inicial = 3;
+                }
+                
+                //NSLog(@"%f",firstX+ translatedPoint.x - [sender view].frame.size.height/2);
+                int estado_final = 0;
+                if (firstX+translatedPoint.x - [sender view].frame.size.height/2 >= 190 && firstX+translatedPoint.x - [sender view].frame.size.height/2 < 465) {
+                    estado_final = 1;
+                }
+                else if (firstX+translatedPoint.x - [sender view].frame.size.height/2 >= 465 && firstX+translatedPoint.x - [sender view].frame.size.height/2 < 730){
+                    estado_final = 2;
+                }
+                else if (firstX+translatedPoint.x - [sender view].frame.size.height/2 >= 730){
+                    estado_final = 3;
+                }
+                
+                if (estado_final != estado_inicial) {
+                    if (estado_final == 3 && estado_inicial == 1) {
+                        change_state_alert = [[UIAlertView alloc] initWithTitle:@"Mudança de STATUS" message:@"Não é possível passar do estado \"TO DO\" para o estado \"DONE\"" delegate:self cancelButtonTitle:@"Não" otherButtonTitles: nil, nil];
+                        [change_state_alert show];
+                        [tableView reloadData];
+                    }
+                    else {
+                        selected_fase_id = estado_final;
+                        selected_task_id = [[sender view] tag];
+                        change_state_alert = [[UIAlertView alloc] initWithTitle:@"Mudança de STATUS" message:@"Deseja alterar o estado da tarefa?" delegate:self cancelButtonTitle:@"Não" otherButtonTitles: @"Sim", nil];
+                        [change_state_alert show];
+                    }
+                        
+                    
+                }
+                else
+                {
+                    [tableView reloadData];
+                }
+                [selected_view setHidden:true];
+                [sender view].layer.zPosition = 0;
+            can_move = NO;
+        }
     }
-    
-
-    if (translatedPoint.x - [sender view].frame.size.width/2 >= 190 && translatedPoint.x - [sender view].frame.size.width/2 < 465) {
-        [selected_view setFrame:CGRectMake(190, 0, 265, [sender view].superview.frame.size.height)];
-        [[sender view].superview addSubview:selected_view];
-        //NSLog(@"%d: TO DO",[[sender view] tag]);
-    }
-    else if (translatedPoint.x - [sender view].frame.size.width/2 >= 465 && translatedPoint.x - [sender view].frame.size.width/2 < 730) {
+    if (can_move) {
+        translatedPoint = CGPointMake(firstX+translatedPoint.x, firstY+translatedPoint.y);
+        //NSLog(@"%f, %f : (0,%f)",translatedPoint.x - [sender view].frame.size.width/2, translatedPoint.y - [sender view].frame.size.height/2,[sender view].superview.frame.size.height - [sender view].frame.size.height);
         
-        [selected_view setFrame:CGRectMake(455, 0, 265, [sender view].superview.frame.size.height)];
-        [[sender view].superview addSubview:selected_view];
-        //NSLog(@"%d: DOING",[[sender view] tag]);
-    }
-    else if (translatedPoint.x - [sender view].frame.size.width/2 >= 730) {
-        [selected_view setFrame:CGRectMake(720, 0, 265, [sender view].superview.frame.size.height)];
-        [[sender view].superview addSubview:selected_view];
-        //NSLog(@"%d: DONE",[[sender view] tag]);
+        if (translatedPoint.y - [sender view].frame.size.height/2 > 0 && translatedPoint.y - [sender view].frame.size.height/2 < [sender view].superview.frame.size.height - [sender view].frame.size.height && translatedPoint.x - [sender view].frame.size.width/2 >= 200) {
+            [[sender view] setCenter:translatedPoint];
+        }
+        
+        
+        if (translatedPoint.x - [sender view].frame.size.width/2 >= 190 && translatedPoint.x - [sender view].frame.size.width/2 < 465) {
+            [selected_view setFrame:CGRectMake(190, 0, 265, [sender view].superview.frame.size.height)];
+            [[sender view].superview addSubview:selected_view];
+            //NSLog(@"%d: TO DO",[[sender view] tag]);
+        }
+        else if (translatedPoint.x - [sender view].frame.size.width/2 >= 465 && translatedPoint.x - [sender view].frame.size.width/2 < 730) {
+            
+            [selected_view setFrame:CGRectMake(455, 0, 265, [sender view].superview.frame.size.height)];
+            [[sender view].superview addSubview:selected_view];
+            //NSLog(@"%d: DOING",[[sender view] tag]);
+        }
+        else if (translatedPoint.x - [sender view].frame.size.width/2 >= 730) {
+            [selected_view setFrame:CGRectMake(720, 0, 265, [sender view].superview.frame.size.height)];
+            [[sender view].superview addSubview:selected_view];
+            //NSLog(@"%d: DONE",[[sender view] tag]);
+        }
     }
     
-    
-
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -129,8 +159,16 @@
         }
         else {
             if ([WebServiceRequest isOnline]) {
+                NSLog(@"%d",selected_task_id);
                 WebServiceRequest *web_service = [WebServiceRequest alloc];
-                [web_service getHTTPResponse:[NSString stringWithFormat:@"%@/scrum_services/update-inicio-fase.php?trfa_id=%d&fase_id=%d",url_basic,selected_task_id,selected_fase_id]];
+                if (selected_fase_id == 1) {
+                    NSLog(@"%@/scrum_services/delete-inicio-fase-ptcp.php?trfa_id=%d",url_basic, selected_task_id);
+                    [web_service getHTTPResponse:[NSString stringWithFormat:@"%@/scrum_services/delete-inicio-fase-ptcp.php?trfa_id=%d",url_basic, selected_task_id]];
+                }
+                else
+                {
+                    [web_service getHTTPResponse:[NSString stringWithFormat:@"%@/scrum_services/update-inicio-fase.php?user_id=%@&proj_id=%@&trfa_id=%d&fase_id=%d",url_basic,logged_user_id, logged_proj_padrao, selected_task_id,selected_fase_id]];
+                }
             }
             [self loadData];
             [tableView reloadData];
@@ -183,6 +221,7 @@
                 NSString *fase = [web_service getTagValue:@"fase_nome" inText:tarefa_content inInitialRange:0];
                 NSString *data_inicio = [web_service getTagValue:@"trfa_data_inicio" inText:tarefa_content inInitialRange:0];
                 NSString *trfa_id = [web_service getTagValue:@"trfa_id" inText:tarefa_content inInitialRange:0];
+                NSString *sigla = [web_service getTagValue:@"ptcp_sigla" inText:tarefa_content inInitialRange:0];
                 
                 NSString *tipo;
                 
@@ -211,12 +250,16 @@
                     [tarefa setBackgroundColor:[UIColor colorWithRed:250/255.0f green:192/255.0f blue:192/255.0f alpha:1.0f]];
                 }
                 
+                /*NSString *ptcp_data = [web_service getHTTPResponse:[NSString stringWithFormat:@"%@/scrum_services/get-task-ptcp.php?trfa_id=%d",url_basic,[trfa_id intValue]]];
+                */
+                
                 
                 
                 //[tarefa setBackgroundColor:[UIColor yellowColor]];
                 tarefa.task_title = tarefa_titulo;
                 tarefa.task_status = fase;
                 tarefa.task_start_date = data_inicio;
+                tarefa.ptcp_sigla = sigla;
                 tarefa.tag = [trfa_id intValue];
                 
                 UITapGestureRecognizer *tapTask = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(editTask:)];
@@ -411,11 +454,6 @@
     
     [self loadData];
     
-    UIBarButtonItem *sync = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(sync:)];
-    
-    UIBarButtonItem *encerrar = [[UIBarButtonItem alloc] initWithTitle:@"Encerrar Sprint" style:UIBarButtonItemStyleDone target:self action:@selector(encerrarSprint:)];
-    
-    self.navigationItem.rightBarButtonItems = [NSArray arrayWithObjects:encerrar, nil];
     
 }
 
@@ -544,8 +582,10 @@
             i_done_h++;
         }
         task.lb_tit.text = task.task_title;
+        task.lb_ptcp.text = task.ptcp_sigla;
         
         [task.lb_tit sizeToFit];
+        [task.lb_ptcp sizeToFit];
         
         
         

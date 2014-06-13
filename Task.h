@@ -15,7 +15,9 @@
 @property (nonatomic, strong) NSString *task_title;
 @property (nonatomic, strong) NSString *task_description;
 @property (nonatomic, strong) NSString *task_status;
+@property (nonatomic, strong) NSString *ptcp_sigla;
 @property (nonatomic, strong) NSString *task_start_date;
 @property (nonatomic, strong) UILabel *lb_tit;
+@property (nonatomic, strong) UILabel *lb_ptcp;
 
 @end

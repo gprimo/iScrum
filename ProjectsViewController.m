@@ -27,7 +27,11 @@
 @synthesize lb_data_fim;
 @synthesize lb_data_game;
 @synthesize lb_data_inicio;
+@synthesize lb_historias_concluidas;
+@synthesize lb_total_historias;
+@synthesize lb_total_sprints;
 @synthesize txt_descricao;
+@synthesize lb_num_releases;
 
 - (void)viewDidLoad
 {
@@ -164,6 +168,10 @@
         lb_data_inicio.text = [web_service getTagValue:@"proj_data_inicio" inText:xmlData inInitialRange:0];
         lb_data_game.text = [web_service getTagValue:@"proj_data_inicio_game" inText:xmlData inInitialRange:0];
         lb_data_fim.text = [web_service getTagValue:@"proj_data_fim" inText:xmlData inInitialRange:0];
+        lb_total_sprints.text = [web_service getTagValue:@"sprints_realizadas" inText:xmlData inInitialRange:0];
+        lb_historias_concluidas.text = [web_service getTagValue:@"historias_concluidas" inText:xmlData inInitialRange:0];
+        lb_total_historias.text = [web_service getTagValue:@"total_historias" inText:xmlData inInitialRange:0];
+        lb_num_releases.text = [web_service getTagValue:@"num_releases" inText:xmlData inInitialRange:0];
     }
     else {
         NSString *query = [[NSString alloc] initWithFormat:@"SELECT p.proj_nome, p.proj_descricao, p.proj_data_inicio, p.proj_data_inicio_game, p.proj_data_fim FROM projeto p WHERE p.proj_id = %@",[projects_ids objectAtIndex:idx]];

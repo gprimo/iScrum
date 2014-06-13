@@ -20,6 +20,7 @@
     UIAlertView *change_state_alert;
     int selected_task_id;
     int selected_fase_id;
+    BOOL can_move;
 }
 
 @property (nonatomic, strong) NSString *menuName;

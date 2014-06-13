@@ -14,9 +14,10 @@
 @synthesize last_final_range;
 @synthesize last_initial_range;
 
-NSString * const url_basic = @"http://192.168.1.3:1888";
+NSString * const url_basic = @"http://amrtec.no-ip.biz:1888";
 NSString * logged_user_id;
 NSString * logged_proj_padrao;
+NSString * logged_user_sigla;
 
 +(BOOL) isOnline
 {

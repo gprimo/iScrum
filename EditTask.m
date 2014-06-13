@@ -216,22 +216,34 @@
 
 -(void) deleteTask:(id)sender{
     
-    if ([WebServiceRequest isOnline]) {
-        WebServiceRequest *web_service = [WebServiceRequest alloc];
+    
         
-        NSString *query = [NSString stringWithFormat:@"%@/scrum_services/delete-task.php?id=%d",url_basic,task_id];
-        
-        NSLog(@"%@",query);
-        
-        NSString *data = [web_service getHTTPResponse:query];
-        
-        if (![data  isEqual: @""]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ModalDismissed" object:nil userInfo:nil];
-            [self dismissViewControllerAnimated:YES completion:nil];
-        }
-    }
+        UIAlertView *delete_alert = [[UIAlertView alloc] initWithTitle:@"Exclusão de tarefa" message:@"Deseja excluir a tarefa?" delegate:self cancelButtonTitle:@"Não" otherButtonTitles: @"Sim", nil];
+        [delete_alert show];
+    
 }
 
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == 0) {
+        NSLog(@"nao");
+    }
+    else {
+        if ([WebServiceRequest isOnline]) {
+            WebServiceRequest *web_service = [WebServiceRequest alloc];
+            NSString *query = [NSString stringWithFormat:@"%@/scrum_services/delete-task.php?id=%d",url_basic,task_id];
+            
+            NSLog(@"%@",query);
+            
+            NSString *data = [web_service getHTTPResponse:query];
+            
+            if (![data  isEqual: @""]) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"ModalDismissed" object:nil userInfo:nil];
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
+        }
+        
+    }
+}
 
 -(void) salvar:(id)sender{
     if ([WebServiceRequest isOnline]) {

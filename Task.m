@@ -14,7 +14,9 @@
 @synthesize task_id;
 @synthesize task_start_date;
 @synthesize task_status;
+@synthesize ptcp_sigla;
 @synthesize lb_tit;
+@synthesize lb_ptcp;
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -30,9 +32,13 @@
         [self.layer setShadowOffset:CGSizeMake(2.0, 2.0)];
         */
         
-        lb_tit = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 100, 120)];
+        lb_tit = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 100, 95)];
         [lb_tit setNumberOfLines:0];
         [self addSubview:lb_tit];
+        
+        lb_ptcp = [[UILabel alloc] initWithFrame:CGRectMake(10, 100, 100, 15)];
+        [lb_ptcp setNumberOfLines:1];
+        [self addSubview:lb_ptcp];
         
         
         // Initialization code

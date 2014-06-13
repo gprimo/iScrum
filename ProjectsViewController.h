@@ -25,6 +25,10 @@
 @property (nonatomic, strong) IBOutlet UILabel *lb_data_inicio;
 @property (nonatomic, strong) IBOutlet UILabel *lb_data_fim;
 @property (nonatomic, strong) IBOutlet UILabel *lb_data_game;
+@property (nonatomic, strong) IBOutlet UILabel *lb_total_sprints;
+@property (nonatomic, strong) IBOutlet UILabel *lb_total_historias;
+@property (nonatomic, strong) IBOutlet UILabel *lb_historias_concluidas;
+@property (nonatomic, strong) IBOutlet UILabel *lb_num_releases;
 @property (nonatomic, strong) IBOutlet UITextView *txt_descricao;
 @property (nonatomic, strong) IBOutlet UIButton *bt_tornar_princ;
 
